@@ -1,0 +1,79 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: ${cluster_name}
+  region: ${region}
+  version: "1.23"
+
+vpc:
+  subnets:
+    private:
+  %{ for availability_zone, subnet_id in subnet_private ~}
+    ${availability_zone}: { id: ${subnet_id} }
+  %{ endfor ~}
+  public:
+  %{ for availability_zone, subnet_id in subnet_public ~}
+    ${availability_zone}: { id: ${subnet_id} }
+  %{ endfor ~}
+
+iam:
+  vpcResourceControllerPolicy: true
+  withOIDC: true
+  serviceAccounts:
+    - metadata:
+        name: ${cluster_name}
+      wellKnownPolicies:
+        imageBuilder: true
+        autoScaler: true
+        awsLoadBalancerController: true
+        externalDNS: true
+        certManager: true
+        ebsCSIController: true
+        efsCSIController: true
+
+managedNodeGroups:
+  - name: ${cluster_name}-workers
+    minSize: ${min_size}
+    maxSize: ${max_size}
+    subnets:
+  %{ for availability_zone, subnet_id in subnet_private ~}
+      - ${subnet_id}
+  %{ endfor ~}
+  desiredCapacity: ${desired_capacity}
+    instanceType: ${instance_type}
+    labels: {role: worker}
+    tags:
+      nodegroup-role: worker
+    iam:
+      withAddonPolicies:
+        imageBuilder: true
+        autoScaler: true
+        externalDNS: true
+        certManager: true
+        ebs: true
+        efs: true
+        albIngress: true
+        cloudWatch: true
+
+  - name: ${cluster_name}-masters
+    minSize: ${min_size}
+    maxSize: ${max_size}
+    subnets:
+  %{ for availability_zone, subnet_id in subnet_public ~}
+     - ${subnet_id}
+  %{ endfor ~}
+  desiredCapacity: ${desired_capacity}
+    instanceType: ${instance_type}
+    labels: {role: masters}
+    tags:
+      nodegroup-role: masters
+    iam:
+      withAddonPolicies:
+        imageBuilder: true
+        autoScaler: true
+        externalDNS: true
+        certManager: true
+        ebs: true
+        efs: true
+        albIngress: true
+        cloudWatch: true

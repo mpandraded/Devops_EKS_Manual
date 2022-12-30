@@ -1,0 +1,12 @@
+dependencies:
+- name: cert-manager
+  repository: https://charts.jetstack.io
+  version: v1.9.1
+- name: external-dns
+  repository: https://charts.bitnami.com/bitnami
+  version: 6.8.1
+- name: ingress-nginx
+  repository: https://kubernetes.github.io/ingress-nginx
+  version: 2.3.0
+digest: sha256:f660ca264090fb676b1ef7d63ff32b8c553aa2c9e83732492abf4528d48440f2
+generated: "2022-09-02T14:51:16.016128-03:00"

@@ -1,0 +1,42 @@
+global:
+  env: dev
+  domain:
+  clusterName:
+
+cert-manager:
+  enabled: true
+  namespace: add-ons
+  installCRDs: true
+  ingressShim:
+    defaultIssuerName: letsencrypt-dev
+    defaultIssuerKind: ClusterIssuer
+    defaultIssuerGroup: cert-manager.io
+
+external-dns:
+  enabled: true
+  namespace: add-ons
+  provider: aws
+  aws:
+    region: us-east-1
+    zoneType: public
+  policy: sync
+  txtOwnerId: mijem-cluster
+  txtPrefix:
+  domainFilters:
+    -
+  sources:
+    - ingress
+    - service
+  registry: txt
+  metrics:
+    enabled: true
+  rbac:
+    create: true
+  serviceAccount:
+    create: true
+    annotations:
+      eks.amazonaws.com/role-arn:
+
+ingress-nginx:
+  enabled: false
+  namespace: add-ons

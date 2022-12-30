@@ -1,0 +1,28 @@
+aws iam create-policy \
+    --policy-name AmazonEKS_EBS_CSI_Driver_Policy_EY \
+    --policy-document file://example-iam-policy.json
+
+
+aws eks describe-cluster \
+    --name open-financing-ey \
+    --query "cluster.identity.oidc.issuer" \
+    --output text
+    
+https://oidc.eks.eu-west-1.amazonaws.com/id/26CA27DA9DD18A94BAD676A2CDD22599
+
+aws iam create-role \
+    --role-name AmazonEKS_EBS_CSI_DriverRole_EY \
+    --assume-role-policy-document file://"trust-policy.json"
+
+
+aws iam attach-role-policy \
+  --policy-arn arn:aws:iam::951208753434:policy/AmazonEKS_EBS_CSI_Driver_Policy_EY \
+  --role-name AmazonEKS_EBS_CSI_DriverRole_EY
+
+helm upgrade -install aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver \
+--namespace kube-system \
+--set image.repository=602401143452.dkr.ecr.eu-west-1.amazonaws.com/eks/aws-ebs-csi-driver \
+--set enableVolumeResizing=true \
+--set enableVolumeSnapshot=true \
+--set serviceAccount.controller.create=true \
+--set serviceAccount.controller.name=ebs-csi-controller-sa

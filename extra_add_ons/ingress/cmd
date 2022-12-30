@@ -1,0 +1,7 @@
+#https://staging.artifacthub.io/packages/helm/ingress-nginx/ingress-nginx/2.15.0
+
+#add repo
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+
+#from inside folder execute
+helm install  ingress-nginx ingress-nginx/ingress-nginx -f ingress.yaml -n add-ons
